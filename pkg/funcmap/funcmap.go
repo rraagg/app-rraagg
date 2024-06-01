@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/rraagg/rraagg/config"
 
@@ -12,10 +13,8 @@ import (
 	"github.com/labstack/gommon/random"
 )
 
-var (
-	// CacheBuster stores a random string used as a cache buster for static files.
-	CacheBuster = random.String(10)
-)
+// CacheBuster stores a random string used as a cache buster for static files.
+var CacheBuster = random.String(10)
 
 // GetFuncMap provides a template function map
 func GetFuncMap() template.FuncMap {
@@ -29,6 +28,7 @@ func GetFuncMap() template.FuncMap {
 		"hasField": HasField,
 		"file":     File,
 		"link":     Link,
+		"getHour":  GetHour,
 	}
 
 	for k, v := range f {
@@ -63,4 +63,12 @@ func Link(url, text, currentPath string, classes ...string) template.HTML {
 
 	html := fmt.Sprintf(`<a class="%s" href="%s">%s</a>`, strings.Join(classes, " "), url, text)
 	return template.HTML(html)
+}
+
+func GetHour(datetime string) (string, error) {
+	t, err := time.Parse(time.RFC3339, datetime)
+	if err != nil {
+		return "", err
+	}
+	return t.Format("03PM"), nil
 }

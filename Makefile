@@ -45,7 +45,7 @@ ent-new:
 # Start the Docker containers
 .PHONY: up
 up:
-	$(DCO_BIN) up -d
+	$(DCO_BIN) -f dev.docker-compose.yml up -d
 	sleep 3
 
 # Stop the Docker containers
@@ -56,7 +56,7 @@ stop:
 # Drop the Docker containers to wipe all data
 .PHONY: down
 down:
-	$(DCO_BIN) down
+	$(DCO_BIN) -f dev.docker-compose.yml down
 
 # Rebuild Docker containers to wipe all data
 .PHONY: reset

@@ -53,6 +53,9 @@ type Container struct {
 
 	// Tasks stores the task client
 	Tasks *TaskClient
+
+	// Weather stores the weather client
+	Weather *WeatherClient
 }
 
 // NewContainer creates and initializes a new Container
@@ -68,6 +71,7 @@ func NewContainer() *Container {
 	c.initTemplateRenderer()
 	c.initMail()
 	c.initTasks()
+	c.initWeather()
 	return c
 }
 
@@ -198,4 +202,8 @@ func (c *Container) initMail() {
 // initTasks initializes the task client
 func (c *Container) initTasks() {
 	c.Tasks = NewTaskClient(c.Config)
+}
+
+func (c *Container) initWeather() {
+	c.Weather = NewWeatherClient(c.Config)
 }
