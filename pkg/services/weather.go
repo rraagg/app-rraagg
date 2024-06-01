@@ -68,7 +68,7 @@ func (w *WeatherClient) GetHourlyForecast(
 ) ([]Period, error) {
 	ctx.Logger().Infof("Getting hourly forecast for x: %d, y: %d, office: %s", x, y, office)
 	client := &http.Client{}
-	url := fmt.Sprintf("%s/%s/%d,%d/forecast", w.config.Weather.Hostname, office, x, y)
+	url := fmt.Sprintf("%s/%s/%d,%d/forecast/hourly", w.config.Weather.Hostname, office, x, y)
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {

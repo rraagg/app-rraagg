@@ -1,2 +1,5 @@
 .idea
 *.yaml
+.air.toml
+.DS_Store
+main
