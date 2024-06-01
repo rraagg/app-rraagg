@@ -36,15 +36,17 @@
             <article class="media">
                 <figure class="media-left">
                     <p class="image is-64x64">
-                        <img src="{{.Icon}}" alt="Gopher"/>
+                        <img src="{{.Icon}}" alt="Weather Icon"/>
                     </p>
                 </figure>
                 <div class="media-content">
                     <div class="content">
                         <p>
-                            <strong>{{.Temperature}} F</strong>
+                            <strong>{{.Temperature}} F - {{ .StartTime | getHour }}</strong>
                             <br>
                             {{.ShortForecast}}
+                            <br>
+                            <small>{{.DetailedForecast}}</small>
                         </p>
                     </div>
                 </div>
