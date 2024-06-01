@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/rraagg/rraagg/pkg/controller"
+	"github.com/rraagg/rraagg/pkg/services"
 	"github.com/rraagg/rraagg/templates"
 
 	"github.com/labstack/echo/v4"
@@ -27,7 +28,7 @@ func (c *home) Get(ctx echo.Context) error {
 	page.Metatags.Description = "Welcome to the homepage."
 	page.Metatags.Keywords = []string{"Go", "MVC", "Web", "Software"}
 	page.Pager = controller.NewPager(ctx, 4)
-	page.Data = c.fetchPosts(&page.Pager)
+	page.Data = c.getHourlyForecast(ctx, &page.Pager)
 
 	return c.RenderPage(ctx, page)
 }
@@ -44,4 +45,21 @@ func (c *home) fetchPosts(pager *controller.Pager) []post {
 		}
 	}
 	return posts[pager.GetOffset() : pager.GetOffset()+pager.ItemsPerPage]
+}
+
+func (c *home) getHourlyForecast(ctx echo.Context, pager *controller.Pager) []services.Period {
+	ctx.Logger().Info("Fetching hourly forecast")
+	tmpX := 74
+	tmpY := 89
+	office := "FGZ"
+
+	periods, err := c.Container.Weather.GetHourlyForecast(ctx, tmpX, tmpY, office)
+	if err != nil {
+		ctx.Logger().Error(err)
+		errPeriods := make([]services.Period, 0)
+		return errPeriods
+	}
+	pager.SetItems(len(periods))
+
+	return periods[pager.GetOffset() : pager.GetOffset()+pager.ItemsPerPage]
 }

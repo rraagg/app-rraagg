@@ -58,6 +58,7 @@ type (
 		Cache    CacheConfig
 		Database DatabaseConfig
 		Mail     MailConfig
+		Weather  WeatherConfig
 	}
 
 	// HTTPConfig stores HTTP configuration
@@ -117,6 +118,15 @@ type (
 		User        string
 		Password    string
 		FromAddress string
+	}
+
+	// WeatherConfig stores the weather configuration
+	WeatherConfig struct {
+		Hostname  string
+		UserAgent string
+		APIKey    string
+		Latitude  string
+		Longitude string
 	}
 )
 
