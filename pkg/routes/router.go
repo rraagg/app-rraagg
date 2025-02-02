@@ -32,6 +32,7 @@ const (
 	routeNameHome                 = "home"
 	routeNameProfile              = "profile"
 	routeNameSearch               = "search"
+	routeNameWeather              = "weather"
 )
 
 // BuildRouter builds the router
@@ -86,6 +87,10 @@ func BuildRouter(c *services.Container) {
 func navRoutes(c *services.Container, g *echo.Group, ctr controller.Controller) {
 	home := home{Controller: ctr}
 	g.GET("/", home.Get).Name = routeNameHome
+
+	weather := weather{Controller: ctr}
+	g.GET("/weather", weather.Get).Name = routeNameWeather
+	g.POST("/weather", weather.Post).Name = routeNameWeather
 
 	profile := profile{Controller: ctr}
 	g.GET("/profile", profile.Get).Name = routeNameProfile

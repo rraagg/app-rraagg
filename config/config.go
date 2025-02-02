@@ -59,6 +59,8 @@ type (
 		Database DatabaseConfig
 		Mail     MailConfig
 		Weather  WeatherConfig
+		Geocode  GeocodingConfig
+		Points   PointsConfig
 	}
 
 	// HTTPConfig stores HTTP configuration
@@ -127,6 +129,16 @@ type (
 		APIKey    string
 		Latitude  string
 		Longitude string
+	}
+
+	// GeocodingConfig stores the geocoding configuration
+	GeocodingConfig struct {
+		Hostname string
+	}
+
+	// PointsConfig stores the points configuration
+	PointsConfig struct {
+		Hostname string
 	}
 )
 

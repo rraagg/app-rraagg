@@ -3,7 +3,7 @@
         {{template "top-content" .}}
     {{- end}}
 
-    {{template "weather" .}}
+    {{template "posts" .}}
 
     {{- if not (eq .HTMX.Request.Target "posts")}}
         {{template "file-msg" .}}
@@ -30,23 +30,21 @@
     </section>
 {{end}}
 
-{{define "weather"}}
+{{define "posts"}}
     <div id="posts">
         {{- range .Data}}
             <article class="media">
                 <figure class="media-left">
                     <p class="image is-64x64">
-                        <img src="{{.Icon}}" alt="Weather Icon"/>
+                        <img src="{{file "gopher.png"}}" alt="Gopher"/>
                     </p>
                 </figure>
                 <div class="media-content">
                     <div class="content">
                         <p>
-                            <strong>{{.Temperature}} F - {{ .StartTime | getHour }}</strong>
+                            <strong>{{.Title}}</strong>
                             <br>
-                            {{.ShortForecast}}
-                            <br>
-                            <small>{{.DetailedForecast}}</small>
+                            {{.Body}}
                         </p>
                     </div>
                 </div>

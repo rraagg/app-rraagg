@@ -14,6 +14,7 @@ type (
 	WeatherClient struct {
 		// config stores application configuration
 		config *config.Config
+		client *http.Client
 	}
 
 	HourlyResponseData struct {
@@ -57,6 +58,7 @@ type (
 func NewWeatherClient(cfg *config.Config) *WeatherClient {
 	return &WeatherClient{
 		config: cfg,
+		client: &http.Client{},
 	}
 }
 
@@ -67,19 +69,18 @@ func (w *WeatherClient) GetHourlyForecast(
 	office string,
 ) ([]Period, error) {
 	ctx.Logger().Infof("Getting hourly forecast for x: %d, y: %d, office: %s", x, y, office)
-	client := &http.Client{}
-	url := fmt.Sprintf("%s/%s/%d,%d/forecast/hourly", w.config.Weather.Hostname, office, x, y)
 
+	url := fmt.Sprintf("%s/%s/%d,%d/forecast/hourly", w.config.Weather.Hostname, office, x, y)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		ctx.Logger().Errorf("unable to create hourly forecast request: %s", err)
 		return nil, err
 	}
-
 	req.Header.Set("User-Agent", w.config.Weather.UserAgent)
 	req.Header.Set("Accept", "application/json")
 	ctx.Logger().Infof("Request: %v", req)
-	resp, err := client.Do(req)
+	resp, err := w.client.Do(req)
+
 	ctx.Logger().Infof("Response: %v", resp)
 
 	if err != nil {
@@ -87,18 +88,17 @@ func (w *WeatherClient) GetHourlyForecast(
 		return nil, err
 	}
 	defer resp.Body.Close()
-
 	var data HourlyResponseData
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
-	ctx.Logger().Infof("Data: %v", data)
+
+	ctx.Logger().Infof("Weather Data: %v", data)
 
 	var periods []Period
 	for _, period := range data.Properties.Periods {
 		periods = append(periods, period)
 		ctx.Logger().Infof("Period: %v", period)
 	}
-
 	return periods, nil
 }

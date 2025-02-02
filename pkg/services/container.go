@@ -7,7 +7,6 @@ import (
 
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/schema"
 
 	// Required by ent
 	_ "github.com/jackc/pgx/v4/stdlib"
@@ -56,6 +55,12 @@ type Container struct {
 
 	// Weather stores the weather client
 	Weather *WeatherClient
+
+	// Geocoding stores the geocoding client
+	Geocoding *GeocodingClient
+
+	// Points stores the points client
+	Points *PointsClient
 }
 
 // NewContainer creates and initializes a new Container
@@ -72,6 +77,8 @@ func NewContainer() *Container {
 	c.initMail()
 	c.initTasks()
 	c.initWeather()
+	c.initGeocoding()
+	c.initPoints()
 	return c
 }
 
@@ -175,7 +182,7 @@ func (c *Container) initDatabase() {
 func (c *Container) initORM() {
 	drv := entsql.OpenDB(dialect.Postgres, c.Database)
 	c.ORM = ent.NewClient(ent.Driver(drv))
-	if err := c.ORM.Schema.Create(context.Background(), schema.WithAtlas(true)); err != nil {
+	if err := c.ORM.Schema.Create(context.Background()); err != nil {
 		panic(fmt.Sprintf("failed to create database schema: %v", err))
 	}
 }
@@ -206,4 +213,12 @@ func (c *Container) initTasks() {
 
 func (c *Container) initWeather() {
 	c.Weather = NewWeatherClient(c.Config)
+}
+
+func (c *Container) initGeocoding() {
+	c.Geocoding = NewGeoCodingClient(c.Config)
+}
+
+func (c *Container) initPoints() {
+	c.Points = NewPointsClient(c.Config)
 }

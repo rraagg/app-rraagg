@@ -3,3 +3,6 @@
 .air.toml
 .DS_Store
 main
+tmp/
+static/json/
+move.sh
