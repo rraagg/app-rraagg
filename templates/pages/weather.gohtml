@@ -1,0 +1,133 @@
+{{define "content"}}
+    {{- if not (eq .HTMX.Request.Target "weather")}}
+        {{template "top-content" .}}
+    {{template "form" .}}
+    {{- end}}
+    
+
+    {{template "weather" .}}
+
+    {{- if not (eq .HTMX.Request.Target "weather")}}
+        {{template "file-msg" .}}
+    {{- end}}
+{{end}}
+
+{{define "top-content"}}
+    <section class="hero is-info welcome is-small">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title">
+                    Hello{{if .IsAuth}}, {{.AuthUser.Name}}{{end}}
+                </h1>
+                <h2 class="subtitle">{{if .IsAuth}}Welcome back!{{else}}Please login in to your account.{{end}}</h2>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h1 class="title">Recent weather</h1>
+        <h2 class="subtitle">
+            Below is an example of both paging and AJAX fetching using HTMX
+        </h2>
+    </section>
+{{end}}
+
+{{define "form"}}
+    {{- if .Form.Submission.IsDone}}
+        <article class="message is-large is-success">
+            <div class="message-header">
+                <p>Thank you!</p>
+            </div>
+            <div class="message-body">
+                Your weather is below.
+            </div>
+        </article>
+    {{- else}}
+        <form id="contact" method="post" hx-target="#weather" hx-post="{{call .ToURL "weather.post"}}">
+            <div class="field">
+                <label for="street" class="label">Street</label>
+                <div class="control">
+                    <input id="street" name="street" type="street" class="input {{.Form.Submission.GetFieldStatusClass "Street"}}" value="{{.Form.Street}}">
+                </div>
+                {{template "field-errors" (.Form.Submission.GetFieldErrors "Street")}}
+            </div>
+
+            <div class="field">
+                <label for="city" class="label">City</label>
+                <div class="control">
+                    <input id="city" name="city" type="city" class="input {{.Form.Submission.GetFieldStatusClass "City"}}" value="{{.Form.City}}">
+                </div>
+                {{template "field-errors" (.Form.Submission.GetFieldErrors "City")}}
+            </div>
+
+            <div class="field">
+                <label for="state" class="label">State</label>
+                <div class="control">
+                    <input id="state" name="state" type="state" class="input {{.Form.Submission.GetFieldStatusClass "State"}}" value="{{.Form.State}}">
+                </div>
+                {{template "field-errors" (.Form.Submission.GetFieldErrors "State")}}
+            </div>
+
+            <div class="field is-grouped">
+                <div class="control">
+                    <button class="button is-link">Submit</button>
+                </div>
+            </div>
+
+            {{template "csrf" .}}
+        </form>
+    {{- end}}
+{{end}}
+
+{{define "weather"}}
+    <div id="weather">
+        {{- range .Data}}
+            <article class="media">
+                <figure class="media-left">
+                    <p class="image is-64x64">
+                        <img src="{{.Icon}}" alt="Weather Icon"/>
+                    </p>
+                </figure>
+                <div class="media-content">
+                    <div class="content">
+                        <p>
+                            <strong>{{.Temperature}} F - {{ .StartTime | getHour }}</strong>
+                            <br>
+                            {{.ShortForecast}}
+                            <br>
+                            <small>{{.DetailedForecast}}</small>
+                        </p>
+                    </div>
+                </div>
+            </article>
+        {{- end}}
+
+        <div class="field is-grouped is-grouped-centered">
+            {{- if not $.Pager.IsBeginning}}
+                <p class="control">
+                    <button class="button is-primary" hx-swap="outerHTML" hx-get="/weather?page={{sub $.Pager.Page 1}}" hx-target="#weather">Previous page</button>
+                </p>
+            {{- end}}
+            {{- if not $.Pager.IsEnd}}
+                <p class="control">
+                    <button class="button is-primary" hx-swap="outerHTML" hx-get="/weather?page={{add $.Pager.Page 1}}" hx-target="#weather">Next page</button>
+                </p>
+            {{- end}}
+        </div>
+    </div>
+{{end}}
+
+{{define "file-msg"}}
+    <div class="block"></div>
+    <article class="message is-small is-warning" x-data="{show: true}" x-show="show">
+        <div class="message-header">
+            <p>Serving files</p>
+            <button class="delete is-small" aria-label="delete" @click="show = false"></button>
+        </div>
+        <div class="message-body">
+            In the example posts above, check how the file URL contains a cache-buster query parameter which changes only when the app is restarted.
+            Static files also contain cache-control headers which are configured via middleware.
+            You can also use AlpineJS to dismiss this message.
+        </div>
+    </article>
+{{end}}

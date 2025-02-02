@@ -31,6 +31,7 @@ const (
 	PageRegister       Page = "register"
 	PageResetPassword  Page = "reset-password"
 	PageSearch         Page = "search"
+	PageWeather        Page = "weather"
 )
 
 //go:embed *

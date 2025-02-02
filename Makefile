@@ -45,7 +45,7 @@ ent-new:
 # Start the Docker containers
 .PHONY: up
 up:
-	$(DCO_BIN) -f dev.docker-compose.yml up -d
+	$(DCO_BIN) -f dev.docker-compose.yml up
 	sleep 3
 
 # Stop the Docker containers
