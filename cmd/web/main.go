@@ -11,6 +11,7 @@ import (
 
 	"github.com/rraagg/rraagg/pkg/routes"
 	"github.com/rraagg/rraagg/pkg/services"
+	"golang.org/x/crypto/acme/autocert"
 )
 
 func main() {
@@ -36,13 +37,15 @@ func main() {
 		}
 
 		if c.Config.HTTP.TLS.Enabled {
-			certs, err := tls.LoadX509KeyPair(c.Config.HTTP.TLS.Certificate, c.Config.HTTP.TLS.Key)
-			if err != nil {
-				c.Web.Logger.Fatalf("cannot load TLS certificate: %v", err)
+			autoTLSManager := autocert.Manager{
+				Prompt: autocert.AcceptTOS,
+				// Cache certificates to avoid issues with rate limits (https://letsencrypt.org/docs/rate-limits)
+				Cache:      autocert.DirCache("/var/www/.cache"),
+				HostPolicy: autocert.HostWhitelist(c.Config.HTTP.TLS.WhiteList),
 			}
 
 			srv.TLSConfig = &tls.Config{
-				Certificates: []tls.Certificate{certs},
+				GetCertificate: autoTLSManager.GetCertificate,
 			}
 		}
 

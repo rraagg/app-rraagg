@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/rraagg/rraagg/config"
+	"github.com/sendgrid/sendgrid-go"
+	sgmail "github.com/sendgrid/sendgrid-go/helpers/mail"
 
 	"github.com/labstack/echo/v4"
 )
@@ -74,7 +76,6 @@ func (m *MailClient) send(email *mail, ctx echo.Context) error {
 			Base(email.template).
 			Files(fmt.Sprintf("emails/%s", email.template)).
 			Execute(email.templateData)
-
 		if err != nil {
 			return err
 		}
@@ -83,12 +84,22 @@ func (m *MailClient) send(email *mail, ctx echo.Context) error {
 	}
 
 	// Check if mail sending should be skipped
-	if m.skipSend() {
-		ctx.Logger().Debugf("skipping email sent to: %s", email.to)
-		return nil
-	}
+	// if m.skipSend() {
+	// 	ctx.Logger().Debugf("skipping email sent to: %s", email.to)
+	// 	return nil
+	// }
+	sender := sgmail.NewEmail("", email.from)
+	receiver := sgmail.NewEmail("", email.to)
 
 	// TODO: Finish based on your mail sender of choice!
+	message := sgmail.NewSingleEmail(sender, email.subject, receiver, email.body, email.template)
+	sendGridClient := sendgrid.NewSendClient(m.config.Mail.SendgridAPIKey)
+	_, err := sendGridClient.Send(message)
+	if err != nil {
+		ctx.Logger().Warnf("Email not sent: %s", err)
+		return errors.New("Email not sent")
+	}
+
 	return nil
 }
 
